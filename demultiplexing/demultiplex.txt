@@ -1,0 +1,24 @@
+# copia il samplesheet nella cartella del server
+# deve essere delimitato da virgole e non sa semicolon ;
+
+# per convertire ; in , fai
+sed 's/;/,/g' temp.csv > samplesheet8.csv
+
+bcl_dir=/pico/scratch/userexternal/mfratell/NGS_RUNS/bcl2fastq/bin
+ss_file=/pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/samplesheet8.csv
+run_dir=/pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/170428_NB501314_0040_AHLKK7BGX2
+
+cd $run_dir 
+$bcl_dir/bcl2fastq --sample-sheet $ss_file --runfolder-dir $run_dir --no-bgzf-compression --no-lane-splitting
+
+# i fastq sono salvati di default nella sottocartella
+/pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/170428_NB501314_0040_AHLKK7BGX2/Data/Intensities/BaseCalls
+
+# se i file sono compressi, decomprimili
+gunzip *.gz
+
+# dal file decompresso puoi contare il numero di reads:
+
+wc -l nomefile.fastq
+# il num. di reads è uguale al risultato diviso 4 (4 righe per ogni read: id, sequenza, strand, qualità)
+
