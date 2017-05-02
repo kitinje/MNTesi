@@ -1,11 +1,28 @@
-note:
-vi qc.sh
+PER COLLEGARTI AL SERVER
+ssh -t mfratell@login.pico.cineca.it "cd /pico/scratch/userexternal/mfratell/MARTINA; bash"
+ssh -t mfratell@login.pico.cineca.it "cd /pico/scratch/userexternal/mfratell/GIADA; bash"
+ssh -t mfratell@login.pico.cineca.it "cd /pico/scratch/userexternal/mfratell/ENRICO; bash"
+
+CREI UNA CARTELLA IN CUI LAVORARE 
+es: 
+/pico/scratch/userexternal/mfratell/MARTINA/RNASeq
+
+Tutti i file fastq devono essere copiati in una sottocartella dal nome ./fastq
+es
+mkdir /pico/scratch/userexternal/mfratell/MARTINA/RNASeq/fastq
+
+
+altre :
+vi qc.sh # editor da bash
 premi A
 ESC + duepunti + wq!
-fai partire un job
 
-cd /pico/scratch/userexternal/mfratell/MARTINA/RNASeq
-cd $CINECA_SCRATCH/MARTINA/RNASeq
+# Fai partire gli script non dal nodo di login ma da dei job
+fai partire un job
 
 qsub -q parallel -I -l select=1:ncpus=20:mem=120G,walltime=24:00:00 -A ELIX_prj7
 qsub -q rcm_visual -I -l select=1:ncpus=20:mem=120G -A ELIX_prj7
+
+#
+cd /pico/scratch/userexternal/mfratell/MARTINA/RNASeq
+cd $CINECA_SCRATCH/MARTINA/RNASeq
