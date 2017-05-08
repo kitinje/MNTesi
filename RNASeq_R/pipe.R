@@ -333,6 +333,6 @@ hs578t.cam.c2.AvsC <- camera(hs578t.Hs, hs578t.idx.c2, design,inter.gene.cor=0.0
 colnames(hs578t.cam.c2.AvsC)=c("GENESET_SIZE", "HCC1187_AvsC_dir", "HCC1187_AvsC_fdr")
     
 
-
+write.table(variabile, sep="\t", col.names=NA, file="nomefile.txt")
 
 
