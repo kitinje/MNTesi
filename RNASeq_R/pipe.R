@@ -1,7 +1,7 @@
 # HCC1187 TAB files in /pico/scratch/userexternal/mfratell/MARTINA/RNASeq/
 # HS578T TAB files in /pico/scratch/userexternal/mfratell/ENRICO/RNASeq/TAB
 # HCC202 TAB files in /pico/scratch/userexternal/mfratell/HCC202/TAB
-
+# le altre /pico/scratch/userexternal/mfratell/JOB/TAB
 # scp mfratell@login.pico.cineca.it:/pico/scratch/userexternal/mfratell/MARTINA/RNASeq_R/TAB/ ./
 
 library(edgeR)
