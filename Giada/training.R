@@ -58,8 +58,7 @@ TEST.score = -log2(TEST.score$AUC_9d)
 names(TRAIN.score) = colnames(TRAIN)
 names(TEST.score) = colnames(TEST)
 
-
-##############
+###########
 
 train_size=dim(TRAIN)[2]
 lho_size=train_size/2
@@ -208,3 +207,49 @@ keepids = rownames(kept)
 
 sTRAIN = TRAIN[keepids,]
 sTEST = TEST[keepids,]
+
+opt.lambda05<-glmnet(t(sTRAIN),TRAIN.score, alpha=0.5,nlambda = 100)$lambda
+grid05 <- expand.grid(.lambda = opt.lambda05, .alpha = rep(0.5,1))
+trc = trainControl(method="repeatedcv", number=2, repeats = 100,allowParallel = TRUE)    
+
+#seed <- 7
+#metric <- "Accuracy"
+#set.seed(seed)
+#mtry <- ncol(sTRAIN)/3
+#tunegrid <- expand.grid(.mtry=mtry)
+
+cl <- makeCluster(6) #onserver
+registerDoParallel(cl)
+pX = train(t(sTRAIN), TRAIN.score, trControl = trc, method="glmnet", tuneGrid = grid05, preProc = c("center", "scale"))
+#pY = train(t(sTRAIN), TRAIN.score, trControl = trc, method="rf", tuneGrid=tunegrid, preProc = c("center", "scale"))
+stopCluster(cl)
+
+pX.coefs = cbind(as.matrix(coef(pX$finalModel,s=pX$finalModel$lambdaOpt))[!(as.matrix(coef(pX$finalModel,s=pX$finalModel$lambdaOpt))==0),])
+pX.coefs[order(pX.coefs,decreasing = T),]
+pX.sig = rownames(pX.coefs)
+pX.sig = pX.sig[2:length(pX.sig)]
+pX.sig = pX.sig[grep("-AS1", pX.sig, invert = T)]
+
+xTRAIN = TRAIN[pX.sig,]
+xTEST = TEST[pX.sig,]
+
+opt.lambda0<-glmnet(t(sTRAIN),TRAIN.score, alpha=0,nlambda = 100)$lambda
+grid0 <- expand.grid(.lambda = opt.lambda0, .alpha = rep(0,1))
+trc = trainControl(method="repeatedcv", number=2, repeats = 100,allowParallel = TRUE)    
+
+cl <- makeCluster(6) #onserver
+registerDoParallel(cl)
+pXX = train(t(xTRAIN), TRAIN.score, trControl = trc, method="glmnet", tuneGrid = grid0, preProc = c("center", "scale"))
+stopCluster(cl)
+
+pXX.coefs = cbind(as.matrix(coef(pXX$finalModel,s=pXX$finalModel$lambdaOpt))[!(as.matrix(coef(pXX$finalModel,s=pXX$finalModel$lambdaOpt))==0),])
+pXX.coefs[order(pXX.coefs,decreasing = T),]
+cbind(pXX.coefs[order(pXX.coefs,decreasing = T),][2:length(pXX.coefs[order(pXX.coefs,decreasing = T),])])
+
+predX = predict(pX, t(sTEST))
+plot(predX, TEST.score)
+cor.test(predX, TEST.score)
+
+predXX = predict(pXX, t(xTEST))
+
+plot(predXX, TEST.score)
