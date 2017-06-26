@@ -1,0 +1,6 @@
+bk = unique(c(seq(-10,-2, length=2), seq(-2, 2, by=0.04), seq(2,10, length=2)))
+col1 = rep("#4575B4", 1)
+col2 = colorRampPalette(rev(brewer.pal(n = 7, name ="RdYlBu")))(100)
+col3 <- rep("#D73027", 1)
+colors3 <- c(col1, col2,col3)
+pheatmap(nrstad.gsva.h0,scale="row", breaks = bk, clustering_distance_rows = "correlation", clustering_distance_cols = "euclidean", color = colors3)
