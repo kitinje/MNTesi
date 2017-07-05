@@ -251,5 +251,7 @@ plot(predX, TEST.score)
 cor.test(predX, TEST.score)
 
 predXX = predict(pXX, t(xTEST))
-
 plot(predXX, TEST.score)
+cor.test(predXX, TEST.score)
+plot(predXX, TEST.score)
+
