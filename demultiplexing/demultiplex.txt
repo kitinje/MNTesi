@@ -1,5 +1,8 @@
 qsub -q parallel -I -l select=1:ncpus=20:mem=120G,walltime=12:00:00 -A ELIX2_prj9
 
+cd /pico/scratch/userexternal/mfratell/Seq_26july/
+
+
 # copia il samplesheet nella cartella del server
 # deve essere delimitato da virgole e non sa semicolon ;
 
