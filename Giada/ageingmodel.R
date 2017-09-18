@@ -239,41 +239,18 @@ colnames(mean_rhopval)<-c("pvalue","rho")
 mean_rhopval = cbind(mean_rhopval, mean_rhopval[,1]*nrow(TRAIN))
 colnames(mean_rhopval)[3]="padj"
 mean_rhopval[which(mean_rhopval[,3]>1),3]<-1
+mean_rhopval = cbind(mean_rhopval, p.adjust(mean_rhopval[,1], method = "fdr") )
+colnames(mean_rhopval)[dim(mean_rhopval)[2]]="fdr"
 
 
 library(h2o)
 localH2O = h2o.init(nthreads = 6)
 
 # MODELLO 1
-
-probes_m001 = mean_rhopval[which(mean_rhopval[,1]<0.000001),]
+probes_m001 = mean_rhopval[which(mean_rhopval[,1]<0.001),]
 probes_m001 = probes_m001[order(probes_m001[,1]),]
-
 TRAIN_m001<-TRAIN[rownames(probes_m001),rownames(preselection.set)]
 dim(TRAIN_m001); dim(preselection.set)
-
 train_m001 <- rbind(preselection.set$AGE,TRAIN_m001); rownames(train_m001)[1]="AGE"
 train_m001 = as.h2o(t(train_m001), destination_frame="train_m001"); dim(train_m001)
-
-( model_m001 = h2o.glm(y = 1, x = 2:735, training_frame = train_m001,  family = "gaussian", alpha = 0, nlambda=100, nfolds=10, missing_values_handling="MeanImputation"))
-
-
-# TEST EMTAB1866
-
-load("EMTAB1866.danes.bvals")
-load("EMTAB1866.Ages")
-
-EMTAB1866.Ages<-EMTAB1866.Ages[which(!(rownames(EMTAB1866.Ages) %in% rownames(preselection.set))),]
-EMTAB1866.qn = EMTAB1866.danes.bvals[rownames(TRAIN),rownames(EMTAB1866.Ages)]
-
-EMTAB1866.qn[t1g,] = preprocessCore::normalize.quantiles.use.target(EMTAB1866.qn[t1g,], target=t1g.goldstd)
-EMTAB1866.qn[t1r,] = preprocessCore::normalize.quantiles.use.target(EMTAB1866.qn[t1r,], target=t1r.goldstd)
-EMTAB1866.qn[t2,] = preprocessCore::normalize.quantiles.use.target(EMTAB1866.qn[t2,], target=t2.goldstd)
-
-EMTAB1866.test = EMTAB1866.qn[rownames(probes_m001),]
-EMTAB1866.test = as.h2o(t(EMTAB1866.test), destination_frame="EMTAB1866.test"); dim(EMTAB1866.test)
-
-EMTAB1866.preds = h2o.predict(model_m001, EMTAB1866.test)
-EMTAB1866.test.preds<-as.data.frame(TEST.preds); rownames(TEST.preds)=colnames(TEST)
-
-# The END
+( model_m001 = h2o.glm(y = 1, x = 2:4438, training_frame = train_m001,  family = "gaussian", alpha = 0.9, nlambda=100, nfolds=10, missing_values_handling="MeanImputation"))
