@@ -69,6 +69,20 @@ bowtie2 -x $BWA_INDEX -1 $Fastq_R1 -2 $Fastq_R2 --local -p 20 -S /pico/scratch/u
 
 
 
+samtools view -bS -@ 20 sofia.sam | samtools sort -@ 20 -o sofia_sorted.bam
+samtools index sofia_sorted.bam
+
+samtools view -@ 20 -b sofia_sorted.bam "chr5:36544862-37398309" > nipbl.bam
+
+samtools sort -@ 20 nipbl.bam -o nipbl_sorted.bam
+samtools index nipbl_sorted.bam
+
+scp mfratell@login.pico.cineca.it:/pico/scratch/userexternal/mfratell/CORNELIA/analisi/sam/nipbl_sorted* ./
+
+PER VISUALIZZARLI 
+IGV
+
+https://software.broadinstitute.org/software/igv/download
 
 
 
