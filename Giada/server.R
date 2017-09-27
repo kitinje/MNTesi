@@ -9,3 +9,7 @@ exit #uscire dal job
 
 
 scp mfratell@login.pico.cineca.it:/pico/scratch/userexternal/mfratell/GIADA/ageing/WKSpace27.RData ./
+
+scp /Users/Giada/Desktop/WKSpace27.RData mfratell@login.pico.cineca.it:/pico/scratch/userexternal/mfratell/GIADA/ageing/
+
+
