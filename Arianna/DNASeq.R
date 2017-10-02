@@ -24,7 +24,6 @@ es 170919_NB501314_0055_AHNCVWBGX3
 cd 170919_NB501314_0055_AHNCVWBGX3/Data/Intensities/Basecalls
 ls -lh
 
-
 gunzip *.gz
 
 /pico/scratch/userexternal/mfratell/CORNELIA/170919_NB501314_0055_AHNCVWBGX3/Data/Intensities/BaseCalls
@@ -35,7 +34,7 @@ sposta fastq
 mv ./170919_NB501314_0055_AHNCVWBGX3/Data/Intensities/BaseCalls/*.fastq ./fastq/
 
 # PER FARE QC
-qsub -q parallel -I -l select=1:ncpus=20:mem=120G,walltime=06:00:00 -A ELIX2_prj9
+qsub -q parallel -I -l select=1:ncpus=20:mem=120G,walltime=24:00:00 -A ELIX2_prj9
 
 cd $CINECA_SCRATCH/CORNELIA/analisi
 
@@ -60,12 +59,21 @@ fastqc -t $ncpus -o $qcDir ./fastq/SOFIA_S1_R2_001.fastq
 
 multiqc ./QC -o ./mQC
 
+#allinea con bowtie2
 module load bowtie2
 Fastq_R1=/pico/scratch/userexternal/mfratell/CORNELIA/analisi/fastq/SOFIA_S1_R1_001.fastq
 Fastq_R2=/pico/scratch/userexternal/mfratell/CORNELIA/analisi/fastq/SOFIA_S1_R2_001.fastq
-BWA_INDEX=/pico/scratch/userexternal/mfratell/GENOME/BOWTIE2/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bowtie_index
+BOWTIE2_INDEX=/pico/scratch/userexternal/mfratell/GENOME/BOWTIE2/GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.bowtie_index
+bowtie2 -x $BOWTIE2_INDEX -1 $Fastq_R1 -2 $Fastq_R2 --local -p 20 -S /pico/scratch/userexternal/mfratell/CORNELIA/analisi/sam/sofia.sam   
 
-bowtie2 -x $BWA_INDEX -1 $Fastq_R1 -2 $Fastq_R2 --local -p 20 -S /pico/scratch/userexternal/mfratell/CORNELIA/analisi/sam/sofia.sam   
+#allinea con bwa
+#scarichi 
+module load bwa
+Fastq_R1=/pico/scratch/userexternal/mfratell/CORNELIA/analisi/fastq/MADRE_S2_R1_001.fastq
+Fastq_R2=/pico/scratch/userexternal/mfratell/CORNELIA/analisi/fastq/MADRE_S2_R2_001.fastq
+hg38_fasta=/pico/scratch/userexternal/mfratell/GENOME/iGENOMES/Homo_sapiens/hg38/Sequence/BWAIndex/genome.fa
+
+bwa mem -M -R '@RG\tID:foo\tSM:bar' -t 20 $hg38_fasta $Fastq_R1 $Fastq_R2 > madre_bwa.sam
 
 
 
