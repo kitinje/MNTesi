@@ -79,9 +79,19 @@ $CIRC_PATH/CIRCexplorer2 annotate --low-confidence  -r $refFlat -g $refgenomeFA 
 
 
 # 4B. TopHat-Fusion Pipe
+TRIM_DIR=/pico/scratch/userexternal/mfratell/ENRICO/circRNA/trimmedfq/HCC1599_ATRA_REP1_trimmed_R
+trimmed_R1_fq=MB157_A1_trimmed_R1.fastq  
+trimmed_R2_fq=MB157_A1_trimmed_R2.fastq  
+TOPHAT_DIR=/pico/scratch/userexternal/mfratell/ENRICO/circRNA/tophat
+PREFIX=MB157_A1
 mkdir $TOPHAT_DIR
 mkdir $TOPHAT_DIR/$PREFIX
 OUT_DIR=$TOPHAT_DIR/$PREFIX
+ncpus=20
+GRCh38_bowtie1_index=/pico/scratch/userexternal/mfratell/GENOME/bowtie1_gencodeV25/GRCh38.p7
+module load tophat
+modue load bowtie
+module load autoload samtools
 tophat2 -o $OUT_DIR -p $ncpus --fusion-search --keep-fasta-order --bowtie1 --no-coverage-search ${GRCh38_bowtie1_index} $trimmed_R1_fq,$trimmed_R2_fq
 mkdir $CIRCBASE_DIR
 mkdir $CIRCBASE_DIR/$PREFIX
