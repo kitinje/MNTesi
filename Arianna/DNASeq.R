@@ -75,9 +75,10 @@ hg38_fasta=/pico/scratch/userexternal/mfratell/GENOME/iGENOMES/Homo_sapiens/hg38
 
 bwa mem -M -R '@RG\tID:foo\tSM:bar' -t 20 $hg38_fasta $Fastq_R1 $Fastq_R2 > madre_bwa.sam
 
-samtools view -bS -@ 20 madre_bwa.sam | samtools sort -@ 20 -o madre_bwa_sorted.sam
-samtools view -bS -@ 20 padre_bwa.sam | samtools sort -@ 20 -o padre_bwa_sorted.sam
-samtools view -bS -@ 20 sofia_bwa.sam | samtools sort -@ 20 -o sofia_bwa_sorted.sam
+module load autoload samtools
+samtools view -bS -@ 20 madre_bwa.sam | samtools sort -@ 20 -o madre_bwa_sorted.bam
+samtools view -bS -@ 20 padre_bwa.sam | samtools sort -@ 20 -o padre_bwa_sorted.bam
+samtools view -bS -@ 20 sofia_bwa.sam | samtools sort -@ 20 -o sofia_bwa_sorted.bam
 
 samtools view -bS -@ 20 sofia.sam | samtools sort -@ 20 -o sofia_sorted.bam
 samtools index sofia_sorted.bam
