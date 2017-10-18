@@ -7,18 +7,27 @@
 # Aligner : Tophat-Fusion (paired-end) // Note: Tophat is the only pe output supported by CircExplorer
 # CircRNA algorithm : circExplorer2
 
-# Collegati al server
+# Server
 ssh -t mfratell@login.pico.cineca.it
 
-# Fai partire tutta la pipeline da un job col comando
-qsub -q rcm_visual -I -l select=1:ncpus=20:mem=120G,walltime=24:00:00 -A ELIX2_prj9
-# se non va bigmem usa rcm_visual o parallel o cambia ELIX â€”> ELIX_prj7, se vuoi vedere questi dati digita â€œsaldo -bâ€
+# Job
+qsub -q bigmem -I -l select=1:ncpus=20:mem=510G,walltime=24:00:00 -A ELIX2_prj9
 
-# Vai nella cartella principale. Per vedere come funziona un comando utilizzato nella piattaforma digita â€œhistory | grep â€œNOME_COMANDOâ€â€
+# Cartella principale
 cd /pico/scratch/userexternal/mfratell/ENRICO/circRNA
 
-#Variabili mie. Per vedere il valore di una variabile digita â€œecho $NOME_VARIABILEâ€
-mkdir /pico/scratch/userexternal/mfratell/ENRICO/circRNA/star_new
+# PREFIX Ã¨ il nome della linea seguito da _ATRA o _CONTROL
+PREFIX=CAL851_ATRA
+
+# PREFIX List
+CAL851_ATRA      MB157_ATRA        MDAMB361_ATRA
+CAL851_CONTROL   MB157_CONTROL     MDAMB361_CONTROL
+HCC1419_ATRA     MDAMB157_ATRA     MDAMB436_ATRA
+HCC1419_CONTROL  MDAMB157_CONTROL  MDAMB436_CONTROL
+HCC1599_ATRA     MDAMB231_ATRA     SKBR3_ATRA
+HCC1599_CONTROL  MDAMB231_CONTROL  SKBR3_CONTROL
+
+# Variabili
 TRIM_DIR=/pico/scratch/userexternal/mfratell/ENRICO/circRNA/trimmedfq_new/merged_trimmedfq
 BASE_DIR=/pico/scratch/userexternal/mfratell/ENRICO/circRNA
 STAR_DIR=/pico/scratch/userexternal/mfratell/ENRICO/circRNA/star_new
@@ -37,10 +46,7 @@ refFlat=/pico/scratch/userexternal/mfratell/GENOME/GENCODE/v25/gencode.v25.refFl
 ncpus=20
 GRCh38_bowtie1_index=/pico/scratch/userexternal/mfratell/GENOME/bowtie1_gencodeV25/GRCh38.p7
 
-# PREFIX Ã¨ il nome della linea seguito da _ATRA o _CONTROL
-PREFIX=CAL851_ATRA
-
-# 0. Load Modules (CINECA)
+# 0. Modules
 module load profile/advanced
 module load autoload cutadapt
 module load autoload samtools/0.1.19
@@ -48,33 +54,29 @@ module load fastqc
 module load python/2.7.9
 module load bowtie
 
-# 4C. Tophat-Fusion Pipe Corrected
-# Just once
-mkdir $TOPHAT_DIR
-# - - - - - - - - - - - - - -
+# 1. Tophat-Fusion Pipe
 trimmed_R1_fq=$TRIM_DIR/$PREFIX"_R1"  
 trimmed_R2_fq=$TRIM_DIR/$PREFIX"_R2"
 mkdir $TOPHAT_DIR/$PREFIX
 
 /pico/scratch/userexternal/mfratell/ENRICO/SW/tophat_2.1.0/tophat2 -o $OUT_DIR -p $ncpus --fusion-search --keep-fasta-order --bowtie1 --no-coverage-search ${GRCh38_bowtie1_index} $trimmed_R1_fq,$trimmed_R2_fq
-mkdir $CIRCBASE_DIR
+
+# 1.1 CIRCExplorer on Tophat
 mkdir $CIRCBASE_DIR/$PREFIX
 mkdir $CIRCBASE_DIR/$PREFIX/tophat
+
 TopHatFus=$TOPHAT_DIR/$PREFIX/"accepted_hits.bam"
 $CIRC_PATH/CIRCexplorer2 parse -o $CIRCBASE_DIR/$PREFIX/tophat -t TopHat-Fusion $TopHatFus 
-$CIRC_PATH/CIRCexplorer2 annotate --low-confidence  -r $refFlat -g $refgenomeFA $CIRCBASE_DIR/$PREFIX/tophat
+$CIRC_PATH/CIRCexplorer2 annotate -r $refFlat -g $refgenomeFA $CIRCBASE_DIR/$PREFIX/tophat
 
-
-# 4D. STAR PIPE NEW
-# Just once
-mkdir $STAR_DIR
-# - - - - - - - - - - - - - - - - - -
+# 2. STAR Pipe
 trimmed_R1_fq=$TRIM_DIR/$PREFIX"_R1"
 trimmed_R2_fq=$TRIM_DIR/$PREFIX"_R2"
 mkdir $BASE_DIR/$PREFIX
 star_prefix=$STAR_DIR/$PREFIX"_"
 $STAR_PATH/STAR --runThreadN $ncpus --genomeDir $GENOME_DIR --sjdbGTFfile $refGTF --sjdbOverhang 100 --readFilesIn $trimmed_R1_fq $trimmed_R2_fq --chimSegmentMin 10 --outFileNamePrefix $star_prefix 
 
+# 2.1 CIRCExplorer on STAR
 mkdir $CIRCBASE_DIR
 mkdir $CIRCBASE_DIR/$PREFIX
 mkdir $CIRCBASE_DIR/$PREFIX/star
@@ -82,3 +84,5 @@ chim_jun=$STAR_DIR/$PREFIX"_Chimeric.out.junction"
 
 $CIRC_PATH/CIRCexplorer2 parse -t STAR $chim_jun -o $CIRCBASE_DIR/$PREFIX/star > $LOG_DIR/$PREFIX"_"CIRCexplorer2_parse.log
 $CIRC_PATH/CIRCexplorer2 annotate --low-confidence  -r $refFlat -g $refgenomeFA $CIRCBASE_DIR/$PREFIX/star > $LOG_DIR/$PREFIX"_"CIRCexplorer2_annotate.log
+
+# END
