@@ -10,11 +10,11 @@ cd /pico/scratch/userexternal/mfratell/Seq_26july/
 sed 's/;/,/g' temp.csv > samplesheet8.csv
 
 bcl_dir=/pico/scratch/userexternal/mfratell/NGS_RUNS/bcl2fastq/bin
-ss_file=/pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/samplesheet8.csv
-run_dir=/pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/170428_NB501314_0040_AHLKK7BGX2
+ss_file=/pico/scratch/userexternal/mfratell/DANIELA/181001_NS500698_0083_AHFHNNBGX7/smpsheet.txt
+run_dir=/pico/scratch/userexternal/mfratell/DANIELA/181001_NS500698_0083_AHFHNNBGX7
 
 cd $run_dir 
-$bcl_dir/bcl2fastq --sample-sheet $ss_file --runfolder-dir $run_dir --no-bgzf-compression --no-lane-splitting
+$bcl_dir/bcl2fastq --sample-sheet $ss_file --runfolder-dir $run_dir --no-bgzf-compression 
 
 # i fastq sono salvati di default nella sottocartella
 /pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/170428_NB501314_0040_AHLKK7BGX2/Data/Intensities/BaseCalls
