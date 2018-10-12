@@ -1,20 +1,20 @@
 qsub -q parallel -I -l select=1:ncpus=20:mem=120G,walltime=12:00:00 -A ELIX2_prj9
 
-cd /pico/scratch/userexternal/mfratell/Seq_26july/
+cd /gpfs/scratch/userexternal/mfratell/NGS/180928_NB501314_0095_AHHYMCBGX5
 
 
 # copia il samplesheet nella cartella del server
 # deve essere delimitato da virgole e non sa semicolon ;
 
 # per convertire ; in , fai
-sed 's/;/,/g' temp.csv > samplesheet8.csv
+# sed 's/;/,/g' temp.csv > samplesheet8.csv
 
-bcl_dir=/pico/scratch/userexternal/mfratell/NGS_RUNS/bcl2fastq/bin
-ss_file=/pico/scratch/userexternal/mfratell/DANIELA/181001_NS500698_0083_AHFHNNBGX7/smpsheet.txt
-run_dir=/pico/scratch/userexternal/mfratell/DANIELA/181001_NS500698_0083_AHFHNNBGX7
+bcl_dir=/gpfs/work/ELIX2_prj23_0/SW/bcl2fastq/BUILD/bin
+ss_file=/gpfs/scratch/userexternal/mfratell/NGS/180928_NB501314_0095_AHHYMCBGX5/samplesheet.txt
+run_dir=/gpfs/scratch/userexternal/mfratell/NGS/180928_NB501314_0095_AHHYMCBGX5
 
 cd $run_dir 
-$bcl_dir/bcl2fastq --sample-sheet $ss_file --runfolder-dir $run_dir --no-bgzf-compression 
+$bcl_dir/bcl2fastq --sample-sheet $ss_file --runfolder-dir $run_dir --no-bgzf-compression --no-lane-splitting
 
 # i fastq sono salvati di default nella sottocartella
 /pico/scratch/userexternal/mfratell/NGS_BCK/RUNS/170428_NB501314_0040_AHLKK7BGX2/Data/Intensities/BaseCalls
